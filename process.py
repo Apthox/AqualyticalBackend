@@ -10,6 +10,36 @@ Desired Output = [
     ...
 ]
 """
+import json
 
 def Preprocess(data):
-    return data
+    new_list = []
+
+    for track in data['data']['tracks']:
+        start = min(x['time'] for x in track['events'])
+        end = max(x['time'] for x in track['events'])
+        duration = end - start
+        predicted = track['predictedVarsConcept']
+        eventCount = len(track['events'])
+        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount}
+        new_list.append(dict)
+
+    return new_list
+
+
+
+# with open('/Users/shawn/Desktop/CST 499/AqualyticalBackend/data/V3136.json') as json_file:
+#     data = json.load(json_file)
+
+# new_list = []
+
+# for track in data['data']['tracks']:
+#     start = min(x['time'] for x in track['events'])
+#     end = max(x['time'] for x in track['events'])
+#     duration = end - start
+#     predicted = track['predictedVarsConcept']
+#     eventCount = len(track['events'])
+#     dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount}
+#     new_list.append(dict)
+
+# print(new_list[0])
