@@ -14,6 +14,7 @@ import json
 
 def Preprocess(data):
     new_list = []
+    trackNum = 0
 
     for track in data['data']['tracks']:
         start = min(x['time'] for x in track['events'])
@@ -21,9 +22,19 @@ def Preprocess(data):
         duration = end - start
         predicted = track['predictedVarsConcept']
         eventCount = len(track['events'])
-        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount}
-        new_list.append(dict)
 
+        if track['varsConcept'] == "Unknown":
+          color = "#FFFFFF"
+        elif predicted == track['varsConcept']:
+          color = "#90EE90"
+        elif track['varsConcept'] == "":
+          color = "#FF0000"
+        else:
+          color = "#ffcccb"
+
+        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount, "Track": trackNum, "Visual": color}
+        new_list.append(dict)
+        trackNum += 1
     return new_list
 
 
