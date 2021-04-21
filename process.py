@@ -16,6 +16,9 @@ def Preprocess(data):
     new_list = []
     trackNum = 0
 
+    with open('./data/update.json', 'w') as outfile:
+        json.dump(data, outfile)
+
     for track in data['data']['tracks']:
         start = min(x['time'] for x in track['events'])
         end = max(x['time'] for x in track['events'])
@@ -37,10 +40,19 @@ def Preprocess(data):
         trackNum += 1
     return new_list
 
+# update_data = {'varsConcaptID': '4d54c131-dc23-47d5-a257-147c516eff41',
+#                 'varsConceptName': 'Testing'}
 
+# with open('./data/V3136.json') as f:
+#   update = json.load(f)
 
-# with open('/Users/shawn/Desktop/CST 499/AqualyticalBackend/data/V3136.json') as json_file:
-#     data = json.load(json_file)
+# for track in update['data']['tracks']:
+#     if track['events'][0]['uuid'] == update_data['varsConcaptID']:
+#         print("TEST")
+#         track['varsConcept'] = update_data['varsConceptName']
+
+#         with open('./data/update.json', 'w') as outfile:
+#             json.dump(update, outfile)
 
 # new_list = []
 
