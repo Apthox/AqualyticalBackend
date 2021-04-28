@@ -25,25 +25,10 @@ def Preprocess(data):
         duration = end - start
         predicted = track['predictedVarsConcept']
         eventCount = len(track['events'])
-        
-        frames = []
-        for event in track['events']:
-            frames.append(int(event['time'] * 30))
-        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount, "UUID": track['events'][0]['uuid'], "Frames": frames}
+
+        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "VarsConcept": track['varsConcept'], "EventCount": eventCount, "UUID": track['events'][0]['uuid']}
         new_list.append(dict)
 
-        if track['varsConcept'] == "Unknown":
-          color = "#FFFFFF"
-        elif predicted == track['varsConcept']:
-          color = "#90EE90"
-        elif track['varsConcept'] == "":
-          color = "#FF0000"
-        else:
-          color = "#ffcccb"
-
-        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount, "Track": trackNum, "Visual": color}
-        new_list.append(dict)
-        trackNum += 1
     return new_list
 
 # update_data = {'varsConcaptID': '4d54c131-dc23-47d5-a257-147c516eff41',
