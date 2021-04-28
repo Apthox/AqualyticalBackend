@@ -22,3 +22,6 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
+
+exports/*
+imports/*

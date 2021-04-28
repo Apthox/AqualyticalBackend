@@ -21,7 +21,10 @@ def Preprocess(data):
         duration = end - start
         predicted = track['predictedVarsConcept']
         eventCount = len(track['events'])
-        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount}
+        frames = []
+        for event in track['events']:
+            frames.append(int(event['time'] * 30))
+        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "EventCount": eventCount, "UUID": track['events'][0]['uuid'], "Frames": frames}
         new_list.append(dict)
 
     return new_list
