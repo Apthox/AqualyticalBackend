@@ -1,16 +1,28 @@
-from flask import Flask, send_file, request
+from flask import Flask, send_file, request, Response
 import json
 import os
 import process
 import pytest
 from flask_cors import CORS
 import processor
+import re
 
 app = Flask(__name__)
 CORS(app)
 
-def getData(filename):
-  with open(filename) as file:
+@app.after_request
+def after_request(response):
+    response.headers.add('Accept-Ranges', 'bytes')
+    return response
+
+def getData(filename, updated):
+  lastestFilename = ""
+  if os.path.exists(updated):
+    lastestFilename = updated
+  else:
+    lastestFilename = filename
+
+  with open(lastestFilename) as file:
     data = json.load(file)
     return data
 
@@ -19,10 +31,10 @@ def getData(filename):
 # todo: add parameter for selecting dataset
 @app.route('/data')
 def dataEndpoint():
-  data = getData('./data/V3136.json')
+  data = getData('./data/V3136.json', './data/update.json')
 
   # Preprocess
-  data = process.Preprocess(data)
+  data = process.Preprocess(data) 
 
   return json.dumps(data)
 
@@ -39,9 +51,9 @@ def updateTrack():
   update_data = request.get_json()
   print(update_data)
 
-  update = getData('./data/V3136.json')
+  update = getData('./data/V3136.json', './data/update.json')
   for track in update['data']['tracks']:
-    if track['events'][0]['uuid'] == update_data['varsConcaptID']:
+    if track['events'][0]['uuid'] == update_data['varsConceptID']:
       track['varsConcept'] = update_data['varsConceptName']
 
       with open('./data/update.json', 'w') as outfile:
@@ -57,6 +69,42 @@ def getImage():
     frame = request.args.get('frame')
 
     return send_file('exports/V3136/' + uuid + '/frame-' + frame + '.jpg')
+
+@app.route('/video')
+def getVideo():
+    uuid = request.args.get('uuid')
+
+    # return send_file('exports/V3136/' + uuid + '/source.mov')
+
+    full_path = 'exports/V3136/' + uuid + '/source.mov'
+    file_size = os.stat(full_path).st_size
+    start = 0
+    length = 10240  # can be any default length you want
+
+    range_header = request.headers.get('Range', None)
+    if range_header:
+        m = re.search('([0-9]+)-([0-9]*)', range_header)  # example: 0-1000 or 1250-
+        g = m.groups()
+        byte1, byte2 = 0, None
+        if g[0]:
+            byte1 = int(g[0])
+        if g[1]:
+            byte2 = int(g[1])
+        if byte1 < file_size:
+            start = byte1
+        if byte2:
+            length = byte2 + 1 - byte1
+        else:
+            length = file_size - start
+
+    with open(full_path, 'rb') as f:
+        f.seek(start)
+        chunk = f.read(length)
+
+    rv = Response(chunk, 206, mimetype='video/quicktime', content_type='video/quicktime', direct_passthrough=True)
+    rv.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
+    return rv
+
 
 @app.route('/init')
 def init():
