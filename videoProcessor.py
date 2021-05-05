@@ -2,6 +2,7 @@ import cv2
 import pandas as pd
 import json
 from vidstab import VidStab
+import os
 
 def processVideo(filename):
     stabilizer = VidStab()
@@ -9,13 +10,16 @@ def processVideo(filename):
     df_summary = pd.DataFrame()
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-    video_in = cv2.VideoCapture('./imports/V3136.mov')
+    video_in = cv2.VideoCapture(f'./imports/{filename}.mov')
     width = video_in.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = video_in.get(cv2.CAP_PROP_FRAME_HEIGHT)
     fps = video_in.get(cv2.CAP_PROP_FPS)
 
+    if not os.path.isdir('./exports/' + filename):
+        os.mkdir('./exports/' + filename)
+
     # Loads JSON track
-    with open('./imports/V3136.json') as f:
+    with open(f'./imports/{filename}.json') as f:
         data = json.load(f)['data']['tracks']
         df_events = pd.json_normalize(data, 'events')
         df_events = df_events[df_events['time'] < 60]
@@ -29,8 +33,11 @@ def processVideo(filename):
 
             uuid = df.name
 
+            if not os.path.isdir(f'./exports/{filename}/{uuid}'):
+                os.mkdir(f'./exports/{filename}/{uuid}')
+
             evt_video_out = cv2.VideoWriter()
-            evt_video_out.open(f'./exports/V3136/{uuid}/source.mov', fourcc, fps, frameSize=(max_w, max_h))
+            evt_video_out.open(f'./exports/{filename}/{uuid}/source.mov', fourcc, fps, frameSize=(max_w, max_h))
 
             print(f'Creating video for {uuid} length {len(df_frames) / fps} seconds')
             print(max_h)
@@ -67,4 +74,4 @@ def processVideo(filename):
     df_events.groupby('uuid').apply(processTrack)
 
 if __name__ == '__main__':
-    processVideo('')
+    processVideo('V3136')
