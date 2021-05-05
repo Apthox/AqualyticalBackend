@@ -15,6 +15,13 @@ def processVideo(filename):
     height = video_in.get(cv2.CAP_PROP_FRAME_HEIGHT)
     fps = video_in.get(cv2.CAP_PROP_FPS)
 
+    frames = video_in.get(cv2.CAP_PROP_FRAME_COUNT)
+    fps = int(video_in.get(cv2.CAP_PROP_FPS))
+    
+    # calculate dusration of the video
+    seconds = int(frames / fps)
+    print(f'length: {seconds} seconds')
+
     if not os.path.isdir('./exports/' + filename):
         os.mkdir('./exports/' + filename)
 
@@ -22,7 +29,7 @@ def processVideo(filename):
     with open(f'./imports/{filename}.json') as f:
         data = json.load(f)['data']['tracks']
         df_events = pd.json_normalize(data, 'events')
-        df_events = df_events[df_events['time'] < 60]
+        df_events = df_events[df_events['time'] <= seconds]
 
         def processTrack(df):
             df_frames = df.sort_values(by=['time'])
