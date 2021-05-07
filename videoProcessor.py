@@ -8,9 +8,10 @@ def processVideo(filename):
     stabilizer = VidStab()
     df_events = pd.DataFrame()
     df_summary = pd.DataFrame()
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc('V','P','8','0')
 
-    video_in = cv2.VideoCapture(f'./imports/{filename}.mov')
+    video_in = cv2.VideoCapture(f'./imports/{filename}.mp4')
     width = video_in.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = video_in.get(cv2.CAP_PROP_FRAME_HEIGHT)
     fps = video_in.get(cv2.CAP_PROP_FPS)
