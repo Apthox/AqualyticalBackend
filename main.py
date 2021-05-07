@@ -107,8 +107,10 @@ def getVideo():
 
 @app.route('/video2/<uuid>')
 def getVideo2(uuid):
-  full_path = 'exports/V3136/' + uuid + '/source.mov'
-  return send_file(full_path, 'video/quicktime')
+  print("hello there")
+  full_path = 'exports/V3136/' + uuid + '/source.mp4'
+  # full_path = 'imports/V3136.mp4'
+  return send_file(full_path, 'video/mp4')
 
 @app.route('/init')
 def init():
