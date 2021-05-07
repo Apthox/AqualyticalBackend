@@ -72,39 +72,43 @@ def getImage():
 
 @app.route('/video')
 def getVideo():
-    uuid = request.args.get('uuid')
+  uuid = request.args.get('uuid')
 
-    # return send_file('exports/V3136/' + uuid + '/source.mov')
+  # return send_file('exports/V3136/' + uuid + '/source.mov')
 
-    full_path = 'exports/V3136/' + uuid + '/source.mov'
-    file_size = os.stat(full_path).st_size
-    start = 0
-    length = 10240  # can be any default length you want
+  full_path = 'exports/V3136/' + uuid + '/source.mp4'
+  file_size = os.stat(full_path).st_size
+  start = 0
+  length = 10240  # can be any default length you want
 
-    range_header = request.headers.get('Range', None)
-    if range_header:
-        m = re.search('([0-9]+)-([0-9]*)', range_header)  # example: 0-1000 or 1250-
-        g = m.groups()
-        byte1, byte2 = 0, None
-        if g[0]:
-            byte1 = int(g[0])
-        if g[1]:
-            byte2 = int(g[1])
-        if byte1 < file_size:
-            start = byte1
-        if byte2:
-            length = byte2 + 1 - byte1
-        else:
-            length = file_size - start
+  range_header = request.headers.get('Range', None)
+  if range_header:
+      m = re.search('([0-9]+)-([0-9]*)', range_header)  # example: 0-1000 or 1250-
+      g = m.groups()
+      byte1, byte2 = 0, None
+      if g[0]:
+          byte1 = int(g[0])
+      if g[1]:
+          byte2 = int(g[1])
+      if byte1 < file_size:
+          start = byte1
+      if byte2:
+          length = byte2 + 1 - byte1
+      else:
+          length = file_size - start
 
-    with open(full_path, 'rb') as f:
-        f.seek(start)
-        chunk = f.read(length)
+  with open(full_path, 'rb') as f:
+      f.seek(start)
+      chunk = f.read(length)
 
-    rv = Response(chunk, 206, mimetype='video/quicktime', content_type='video/quicktime', direct_passthrough=True)
-    rv.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
-    return rv
+  rv = Response(chunk, 206, mimetype='video/mp4', content_type='video/mp4', direct_passthrough=True)
+  rv.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
+  return rv
 
+@app.route('/video2/<uuid>')
+def getVideo2(uuid):
+  full_path = 'exports/V3136/' + uuid + '/source.mov'
+  return send_file(full_path, 'video/quicktime')
 
 @app.route('/init')
 def init():
@@ -113,4 +117,4 @@ def init():
     return
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

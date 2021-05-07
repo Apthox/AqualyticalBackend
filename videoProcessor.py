@@ -44,7 +44,7 @@ def processVideo(filename):
                 os.mkdir(f'./exports/{filename}/{uuid}')
 
             evt_video_out = cv2.VideoWriter()
-            evt_video_out.open(f'./exports/{filename}/{uuid}/source.mov', fourcc, fps, frameSize=(max_w, max_h))
+            evt_video_out.open(f'./exports/{filename}/{uuid}/source.mp4', fourcc, fps, frameSize=(max_w, max_h))
 
             print(f'Creating video for {uuid} length {len(df_frames) / fps} seconds')
             print(max_h)
