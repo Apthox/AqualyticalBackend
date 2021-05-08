@@ -76,7 +76,7 @@ def getVideo():
 
   # return send_file('exports/V3136/' + uuid + '/source.mov')
 
-  full_path = 'exports/V3136/' + uuid + '/source.mp4'
+  full_path = 'exports/V3136/' + uuid + '/source.webm'
   file_size = os.stat(full_path).st_size
   start = 0
   length = 10240  # can be any default length you want
@@ -101,16 +101,16 @@ def getVideo():
       f.seek(start)
       chunk = f.read(length)
 
-  rv = Response(chunk, 206, mimetype='video/mp4', content_type='video/mp4', direct_passthrough=True)
+  rv = Response(chunk, 206, mimetype='video/webm', content_type='video/webm', direct_passthrough=True)
   rv.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
   return rv
 
 @app.route('/video2/<uuid>')
 def getVideo2(uuid):
   print("hello there")
-  full_path = 'exports/V3136/' + uuid + '/source.mp4'
+  full_path = 'exports/V3136/' + uuid + '/source.webm'
   # full_path = 'imports/V3136.mp4'
-  return send_file(full_path, 'video/mp4')
+  return send_file(full_path, 'video/webm')
 
 @app.route('/init')
 def init():

@@ -4,12 +4,15 @@ import json
 from vidstab import VidStab
 import os
 
+count = 0
+total = 0
+
 def processVideo(filename):
     stabilizer = VidStab()
     df_events = pd.DataFrame()
     df_summary = pd.DataFrame()
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fourcc = cv2.VideoWriter_fourcc('V','P','8','0')
+    fourcc = cv2.VideoWriter_fourcc(*'VP90')
 
     video_in = cv2.VideoCapture(f'./imports/{filename}.mp4')
     width = video_in.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -32,7 +35,14 @@ def processVideo(filename):
         df_events = pd.json_normalize(data, 'events')
         df_events = df_events[df_events['time'] <= seconds]
 
+        total = df_events.groupby('uuid').ngroups
+
         def processTrack(df):
+            global count
+            count = count + 1
+
+            print(f'{count} / {total}')
+
             df_frames = df.sort_values(by=['time'])
             # print(df)
 
@@ -43,9 +53,19 @@ def processVideo(filename):
 
             if not os.path.isdir(f'./exports/{filename}/{uuid}'):
                 os.mkdir(f'./exports/{filename}/{uuid}')
+            
+            row = df_frames[df_frames['surprise']==df_frames['surprise'].max()]
+            frame = round(row.time.values[0] * fps)
+            video_in.set(cv2.CAP_PROP_POS_FRAMES, frame)
+            ret, frame = video_in.read()
+            x = int(row.x.values[0] - round((max_w - row.width.values[0])/2))
+            y = int(row.y.values[0] - round((max_h - row.height.values[0])/2))
+            crop = frame[y:y+max_h,x:x+max_w]
+            cv2.imwrite(f'./exports/{filename}/{uuid}/thumbnail.png', crop)
+            print('Image Generated!')
 
             evt_video_out = cv2.VideoWriter()
-            evt_video_out.open(f'./exports/{filename}/{uuid}/source.mp4', fourcc, fps, frameSize=(max_w, max_h))
+            evt_video_out.open(f'./exports/{filename}/{uuid}/source.webm', fourcc, fps, frameSize=(max_w, max_h))
 
             print(f'Creating video for {uuid} length {len(df_frames) / fps} seconds')
             print(max_h)
