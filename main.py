@@ -4,7 +4,7 @@ import os
 import process
 import pytest
 from flask_cors import CORS
-import processor
+# import processor
 import re
 
 app = Flask(__name__)
@@ -112,11 +112,11 @@ def getVideo2(uuid):
   # full_path = 'imports/V3136.mp4'
   return send_file(full_path, 'video/webm')
 
-@app.route('/init')
-def init():
-    processor.process('V3136')
+# @app.route('/init')
+# def init():
+#     processor.process('V3136')
 
-    return
+#     return
 
 if __name__ == '__main__':
-    app.run(debug=True)
+  app.run(host='127.0.0.1')
