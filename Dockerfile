@@ -1,21 +1,14 @@
 FROM python:3
 
-RUN mkdir -p /usr/src/app
+LABEL maintainer="Kevin Guzman <keguzman@csumb.edu>"
 
-WORKDIR /usr/src/app
+COPY ./requirements.txt /app/requirements.txt
 
-COPY requirements.txt /usr/src/app
-RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
+WORKDIR /app
 
-COPY ./main.py /usr/src/app
-COPY ./process.py /usr/src/app
-COPY ./videoProcessor.py /usr/src/app
-COPY ./imports /usr/src/app
-COPY ./exports /usr/src/app
-COPY ./data /usr/src/app
+RUN pip install -r requirements.txt
 
-ENV PORT 5000
+EXPOSE 5000
 
-EXPOSE $PORT
-
-CMD [ "python", "./main.py" ]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "main:app", "-w", "2", "--timeout", "120"]
