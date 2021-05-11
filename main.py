@@ -63,12 +63,12 @@ def updateTrack():
   return "pass"
 
 
-@app.route('/img')
-def getImage():
-    uuid = request.args.get('uuid')
-    frame = request.args.get('frame')
+# @app.route('/img')
+# def getImage():
+#     uuid = request.args.get('uuid')
+#     frame = request.args.get('frame')
 
-    return send_file('exports/V3136/' + uuid + '/frame-' + frame + '.jpg')
+#     return send_file('exports/V3136/' + uuid + '/frame-' + frame + '.jpg')
 
 @app.route('/video')
 def getVideo():
@@ -112,6 +112,13 @@ def getVideo2(uuid):
   # full_path = 'imports/V3136.mp4'
   return send_file(full_path, 'video/webm')
 
+@app.route('/image')
+def getImage():
+  print("hello")
+  uuid = request.args.get('uuid')
+  full_path = 'exports/V3136/' + uuid + '/thumbnail.png'
+  return send_file(full_path, 'image/png')
+
 # @app.route('/init')
 # def init():
 #     processor.process('V3136')
@@ -120,3 +127,4 @@ def getVideo2(uuid):
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0')
+  # app.run(debug=True)
