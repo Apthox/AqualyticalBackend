@@ -4,7 +4,7 @@ import os
 import process
 import pytest
 from flask_cors import CORS
-import processor
+# import processor
 import re
 
 app = Flask(__name__)
@@ -15,6 +15,7 @@ def after_request(response):
     response.headers.add('Accept-Ranges', 'bytes')
     return response
 
+# ./data/V3136/V3136.json // READ ONLY
 def getData(filename, updated):
   lastestFilename = ""
   if os.path.exists(updated):
@@ -38,16 +39,10 @@ def dataEndpoint():
 
   return json.dumps(data)
 
-# ./data
-# ./data/V3136/ -> create folder for data
-# ./data/V3136/Summary.json
-# ./data/V3136/V3136.json // READ ONLY
-# ./data/V3136/t*/*.png
-# @Shawn TODO: complete this functional POST request to update the data
 # Receiving object { varsConceptID, varsConceptName } 
-
 @app.route('/update', methods=["POST"])
 def updateTrack():
+  print("Entering the updateTrack")
   update_data = request.get_json()
   print(update_data)
 
@@ -61,14 +56,6 @@ def updateTrack():
       break
 
   return "pass"
-
-
-@app.route('/img')
-def getImage():
-    uuid = request.args.get('uuid')
-    frame = request.args.get('frame')
-
-    return send_file('exports/V3136/' + uuid + '/frame-' + frame + '.jpg')
 
 @app.route('/video')
 def getVideo():
@@ -105,18 +92,21 @@ def getVideo():
   rv.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
   return rv
 
-@app.route('/video2/<uuid>')
-def getVideo2(uuid):
-  print("hello there")
-  full_path = 'exports/V3136/' + uuid + '/source.webm'
-  # full_path = 'imports/V3136.mp4'
-  return send_file(full_path, 'video/webm')
+# @app.route('/video2/<uuid>')
+# def getVideo2(uuid):
+#   print("hello there")
+#   full_path = 'exports/V3136/' + uuid + '/source.webm'
+#   # full_path = 'imports/V3136.mp4'
+#   return send_file(full_path, 'video/webm')
 
-@app.route('/init')
-def init():
-    processor.process('V3136')
+@app.route('/image')
+def getImage():
+  uuid = request.args.get('uuid')
+  full_path = 'exports/V3136/' + uuid + '/thumbnail.png'
+  return send_file(full_path, 'image/png')
 
-    return
-
+# app.run 1: Dockerfile
+# app.run 2: local machine
 if __name__ == '__main__':
-    app.run(debug=True)
+  # app.run(host='0.0.0.0')
+  app.run(debug=True)

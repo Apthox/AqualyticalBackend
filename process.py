@@ -22,11 +22,10 @@ def Preprocess(data):
     for track in data['data']['tracks']:
         start = min(x['time'] for x in track['events'])
         end = max(x['time'] for x in track['events'])
-        duration = end - start
         predicted = track['predictedVarsConcept']
         eventCount = len(track['events'])
 
-        dict = {"Duration": duration, "Start": start, "End": end, "Predicted": predicted, "VarsConcept": track['varsConcept'], "EventCount": eventCount, "UUID": track['events'][0]['uuid']}
+        dict = {"Start": start, "End": end, "Predicted": predicted, "VarsConcept": track['varsConcept'], "EventCount": eventCount, "UUID": track['events'][0]['uuid']}
         new_list.append(dict)
 
     return new_list
